@@ -89,6 +89,7 @@ gen3_user_verify() {
 # after these steps kube-setup-wts can recreate client
 #
 remove_wts_creds_secrets() {
+  ls -lh "$(gen3_secrets_folder)/g3auto/wts/"
   appCredsPath="$(gen3_secrets_folder)/g3auto/wts/appcreds.json"
   if [ -f "$appCredsPath" ]; then
       echo "Removing local wts cred file"
