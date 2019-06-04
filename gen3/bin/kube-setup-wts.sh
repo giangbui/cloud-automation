@@ -13,7 +13,10 @@ setup_creds() {
     if ! g3kubectl describe secret wts-g3auto | grep appcreds.json > /dev/null 2>&1; then
         credsPath="$(gen3_secrets_folder)/g3auto/wts/appcreds.json"
         if [ -f "$credsPath" ]; then
-            gen3 secrets sync
+            if ! gen3 secrets sync; then 
+                echo "not using gen3 secret sync to create secret for wts"
+                g3kubectl create secret generic wts-g3auto
+            fi
             return 0
         fi
         hostname=$(g3kubectl get configmaps/global -o=jsonpath='{.data.hostname}')
@@ -46,7 +49,10 @@ setup_creds() {
             "wts_base_url": "https://${hostname}/wts/"
         }
 EOM
-        gen3 secrets sync
+        if ! gen3 secrets sync; then 
+            echo "not using gen3 secret sync to create secret for wts"
+            g3kubectl create secret generic wts-g3auto
+        fi
     fi
 
     if ! g3kubectl describe secret wts-g3auto | grep dbcreds.json > /dev/null 2>&1; then
@@ -54,7 +60,10 @@ EOM
         if ! gen3 db setup wts; then
             echo "Failed setting up database for workspace token service"
         fi
-        gen3 secrets sync
+        if ! gen3 secrets sync; then 
+            echo "not using gen3 secret sync to create secret for wts"
+            g3kubectl create secret generic wts-g3auto
+        fi
     fi
 }
 
